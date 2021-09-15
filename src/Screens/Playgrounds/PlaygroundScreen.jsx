@@ -29,13 +29,13 @@ class PlaygroundScreen extends Component {
             dataRankOneLoading:false,
             dataRankTwo: dummyRankTwoSection,
             dataRankTwoLoading:false,
-            dataOtherMovie: dummyRankTwoSection,
+            dataOtherMovie: [...dummyRankOneSection, ...dummyRankTwoSection],
             dataOtherMovieLoading: false,
         }
     }
 
     componentDidMount(){
-        // this._handleGetMovieAPI()
+        this._handleGetMovieAPI()
     }
 
     _handleOnClick = (id) => {
@@ -46,7 +46,7 @@ class PlaygroundScreen extends Component {
     }
 
     _handleGetMovieAPI = async () => {
-        this.setState({dataRankOneLoading:true, dataRankTwoLoading:true})
+        this.setState({dataRankOneLoading:true, dataRankTwoLoading:true, dataOtherMovieLoading:true})
         try {
             const response = await getMovie()
             if(response?.data?.items){
@@ -58,7 +58,9 @@ class PlaygroundScreen extends Component {
                     dataOtherMovie: response.data.items.slice(20,250),
                     dataOtherMovieLoading: false,
                 })
-
+            }else{
+                this.setState({dataRankOneLoading:false, dataRankTwoLoading:false, dataOtherMovieLoading:false})
+                Alert.alert('Error Get Data', 'Failed to load data, try to close the app, clean it from memory then open it again')
             }
         } catch (error) {
             Alert.alert('Error Get Data', 'Failed to load data, try to close the app, clean it from memory then open it again')
@@ -67,7 +69,7 @@ class PlaygroundScreen extends Component {
     }
     
     render(){
-        const {listCategory, dataRankOne, dataRankOneLoading, dataRankTwo, dataRankTwoLoading} = this.state
+        const {listCategory, dataRankOne, dataRankOneLoading, dataRankTwo, dataRankTwoLoading, dataOtherMovie, dataOtherMovieLoading} = this.state
         return(
             <Container>
                 <ScrollView>
@@ -90,7 +92,7 @@ class PlaygroundScreen extends Component {
                     <CRankOneSection data={dataRankOne} loading={dataRankOneLoading} navigation={this.props.navigation} />
                     <CGap height={20} />
                     <CRankTwoSection data={dataRankTwo} loading={dataRankTwoLoading} navigation={this.props.navigation} />
-                    <COtherMovie data={dataRankTwo} loading={dataRankTwoLoading} navigation={this.props.navigation} />
+                    <COtherMovie data={dataOtherMovie} loading={dataOtherMovieLoading} navigation={this.props.navigation} />
                 </ScrollView>
             </Container>
         )
